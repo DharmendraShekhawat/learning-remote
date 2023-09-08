@@ -1,54 +1,66 @@
 package org.example;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+
 public class Main {
     public static void main(String[] args) throws IOException {
+        URL url = null;
+        HttpURLConnection connection = null;
+        int responseCode = 0;
+        String urlString = "https://api.chucknorris.io/jokes/random";
 
-       // step 1 define the URl using URL class
-        URL ul = new URL( "https://api.nationalize.io/?name=nathaniel");
-        // step 2 opening the connection
-        HttpURLConnection connection = (HttpURLConnection) ul.openConnection();
-        // step 3 setting the request method
-        connection.setRequestMethod("GET");
-     // step 4 here we are fetching the response code
-        int responseCode = connection.getResponseCode();
-        if(responseCode == 200){
-            // getting the InputStream  from the connection
-            // InputStreamreader is responsible for converting the byte codes into characters
-            // The main purpose of InputStreamReader is to provide a way to read text data from an input stream,
-            //				such as reading text files or reading data from a network connection, where the data is represented
-            //				as a sequence of bytes. InputStreamReader converts these bytes into characters using a specified
-            //				character encoding, allowing the data to be processed as text in Java.
 
-            InputStream inputstream = connection.getInputStream();
-            InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
-            // bufferedReader is responsible for efficiently reading the data
-            BufferedReader bf = new BufferedReader(inputstreamreader);
-            String line;
-            StringBuilder sb = new StringBuilder();
-            while( (line = bf.readLine()) != null){
-                sb.append(line);
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            System.out.println("problem in URL");
+        }
+
+        //connection
+
+        try {
+            connection = (HttpURLConnection) url.openConnection();
+            responseCode = connection.getResponseCode();
+        } catch (Exception e) {
+            System.out.println("connection problem");
+        }
+
+        //extract information from the connection object:
+
+        if(responseCode == 200)
+        {
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder apiData = new StringBuilder();
+            String readLine = null;
+
+            while(true)
+            {
+                try {
+                    if (((readLine = in.readLine())!= null)) break;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                apiData.append(readLine);
             }
-            bf.close();
-            inputstream.close();
-            System.out.println(sb.toString());
 
-            JSONObject jn = new JSONObject(sb.toString());
+            //
+            try {
+                in.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-            System.out.println();
-            String prettyJSON = jn.toString(2);
-            System.out.println(prettyJSON);
+            System.out.println(apiData.toString());
         }
-        else{
-            System.out.println("Connection failed");
-        }
+        else
+            System.out.println("API call could not be made!!!");
+
+
     }
 }
