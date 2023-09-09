@@ -1,5 +1,8 @@
 package org.example;
 
+import org.json.JSONObject;
+import org.json.Property;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,13 +10,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-
 public class Main {
     public static void main(String[] args) throws IOException {
+
         URL url = null;
         HttpURLConnection connection = null;
         int responseCode = 0;
-        String urlString = "https://api.chucknorris.io/jokes/random";
+        String urlString = "https://api.zippopotam.us/us/33162";
 
 
         try {
@@ -39,13 +42,8 @@ public class Main {
             StringBuilder apiData = new StringBuilder();
             String readLine = null;
 
-            while(true)
+            while((readLine = in.readLine())!= null)
             {
-                try {
-                    if (((readLine = in.readLine())!= null)) break;
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
                 apiData.append(readLine);
             }
 
@@ -56,11 +54,16 @@ public class Main {
                 throw new RuntimeException(e);
             }
 
-            System.out.println(apiData.toString());
+
+            JSONObject jsonAPIResponse = new JSONObject(apiData.toString());
+            System.out.println(jsonAPIResponse.get("post code"));
+            System.out.println(jsonAPIResponse.get("country"));
+            System.out.println(jsonAPIResponse.get("country abbreviation"));
+            System.out.println(jsonAPIResponse.get("places"));
+
+
         }
         else
             System.out.println("API call could not be made!!!");
-
-
     }
 }
